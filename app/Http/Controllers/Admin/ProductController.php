@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Product;
 use App\Models\Category;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\DB;
 
 class ProductController extends Controller
@@ -37,25 +38,39 @@ class ProductController extends Controller
     }
 
     public function store(Request $request)
-    {
+{
+    $request->validate([
+        'name' => 'required|string|max:255',
+        'sku' => 'required|string|max:100|unique:products,sku',
+        'price' => 'required|numeric|min:0',
+        'stock' => 'required|integer|min:0',
+        'category_id' => 'nullable|exists:categories,id',
+        'description' => 'nullable|string', // Validasi deskripsi
+        'photo' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048', // Validasi foto
+    ]);
 
-        $validated= $request->validate([
-            "name" => "required|min:3",
-            "description" => "nullable",
-            "price" => "required",
-            "stock" => "required",
-            "sku" => "required",
-            "category_id" => "required",
-        ]);
-
-        Product::create($validated);
-
-        return redirect('/products')->with('success', 'Berhasil Menambahkan Produk');
+    $photo = null;
+    if ($request->hasFile('photo')) {
+        $photo = $request->file('photo')->store('products', 'public'); // Simpan di storage
     }
+
+    Product::create([
+        'name' => $request->name,
+        'sku' => $request->sku,
+        'price' => $request->price,
+        'stock' => $request->stock,
+        'category_id' => $request->category_id,
+        'description' => $request->description, // Simpan deskripsi
+        'photo' => $photo,
+    ]);
+
+    return redirect('/products')->with('success', 'Produk berhasil ditambahkan');
+}
+
 
     public function edit($id){
         $categories = Category::all();
-        $product = Product::find($id);
+        $product = Product::findOrFail($id);
 
         return view('page.products.edit', [
             "categories" => $categories,
@@ -64,29 +79,53 @@ class ProductController extends Controller
     }
 
     public function update(Request $request, $id)
-    {
+{
+    $product = Product::findOrFail($id);
 
-        $validated= $request->validate([
-            "name" => "required|min:3",
-            "description" => "nullable",
-            "price" => "required",
-            "stock" => "required",
-            "sku" => "required",
-            "category_id" => "required",
-        ]);
+    $request->validate([
+        'name' => 'required|string|max:255',
+        'sku' => "required|string|max:100|unique:products,sku,$id",
+        'price' => 'required|numeric|min:0',
+        'stock' => 'required|integer|min:0',
+        'category_id' => 'nullable|exists:categories,id',
+        'description' => 'nullable|string', // Validasi deskripsi
+        'photo' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+    ]);
 
-        Product::where('id', $id)->update($validated);
-
-        return redirect('/products')->with('success', 'Berhasil Memperbaharui Produk');
+    $photo = $product->photo;
+    if ($request->hasFile('photo')) {
+        if ($product->photo) {
+            Storage::disk('public')->delete($product->photo); // Hapus foto lama jika ada
+        }
+        $photo = $request->file('photo')->store('products', 'public');
     }
+
+    $product->update([
+        'name' => $request->name,
+        'sku' => $request->sku,
+        'price' => $request->price,
+        'stock' => $request->stock,
+        'category_id' => $request->category_id,
+        'description' => $request->description, // Update deskripsi
+        'photo' => $photo,
+    ]);
+
+    return redirect('/products')->with('success', 'Produk berhasil diperbarui');
+}
+
 
 
     public function delete($id)
     {
-        $product = Product::findOrFail($id); 
+        $product = Product::findOrFail($id);
+    
+        if ($product->photo) {
+            Storage::disk('public')->delete($product->photo); // Hapus foto jika ada
+        }
+    
         $product->delete();
-
-        return redirect('/products')->with('success', 'Berhasil Menghapus Produk');
+    
+        return redirect('/products')->with('success', 'Produk berhasil dihapus');
     }
 
 }

@@ -19,7 +19,7 @@
 @section('content')
     <div class="row">
         <div class="col">
-            <form action="/products/store" method="POST">
+            <form action="/products/store" method="POST" enctype="multipart/form-data">
                 @csrf
                 @method('POST')
                     <div class="card">
@@ -71,6 +71,15 @@
                                     <span class="invalid-feedback">{{ $message }}</span>
                                 @enderror
                             </div>
+
+                        <div class="form-group">
+                            <label for="photo">Foto Produk</label>
+                            <input type="file" class="form-control @error('photo') is-invalid @enderror" name="photo" id="photo">
+                            @error('photo')
+                                <span class="invalid-feedback">{{ $message }}</span>
+                            @enderror
+                        </div>
+                            
                         </div>
                         <div class="card-footer">
                             <div class="d-flex justify-content-end">

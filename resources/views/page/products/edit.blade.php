@@ -19,7 +19,7 @@
 @section('content')
     <div class="row">
         <div class="col">
-            <form action="/products/{{ $product->id }}" method="POST">
+            <form action="/products/{{ $product->id }}" method="POST" enctype="multipart/form-data">
                 @csrf
                 @method('PUT')
                     <div class="card">
@@ -60,7 +60,7 @@
                                 @enderror
                             </div>
                             <div class="form-group">
-                                <label for="category_id"class="form-label">Kategori</label>
+                                <label for="category_id"class="form-label">Tipe</label>
                                 <select name="category_id" id="category_id" class="form-control @error('category_id') is-invalid @enderror" value="{{ old('category_id') }}" >
                                     @foreach ($categories as $category)
                                     <option value="{{ $category->id }}" {{ $product->category_id === $category->id ? 'selected' : '' }} >{{ $category->name }}</option>
@@ -70,6 +70,18 @@
                                     <span class="invalid-feedback">{{ $message }}</span>
                                 @enderror
                             </div>
+                            
+                            <div class="form-group">
+                                <label for="photo" class="form-label">Foto Produk</label>
+                                @if ($product->photo)
+                                    <img src="{{ asset('storage/' . $product->photo) }}" width="100" class="mb-2">
+                                @endif
+                                <input type="file" class="form-control @error('photo') is-invalid @enderror" name="photo">
+                                @error('photo')
+                                    <span class="invalid-feedback">{{ $message }}</span>
+                                @enderror
+                            </div>
+
                         </div>
                         <div class="card-footer">
                             <div class="d-flex justify-content-end">

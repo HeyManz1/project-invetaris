@@ -46,7 +46,8 @@
                                 <th>Kode Barang</th>
                                 <th>Harga</th>
                                 <th>Stok</th>
-                                <th>Kategori</th>
+                                <th>Tipe</th>
+                                <th>Foto</th>
                                 <th>Action</th>
                             </tr>
                         </thead>
@@ -61,17 +62,32 @@
                                     <td>{{ $product->stock }}</td>
                                     <td>{{ $product->category->name ?? '-' }}</td>
                                     <td>
+                                        @if ($product->photo)
+                                            <img src="{{ asset('storage/' . $product->photo) }}" width="50" class="img-thumbnail" data-bs-toggle="modal" data-bs-target="#modalFoto{{ $product->id }}" style="cursor: pointer;">
+    
+                                            <!-- Modal untuk memperbesar gambar -->
+                                            <div class="modal fade" id="modalFoto{{ $product->id }}" tabindex="-1" aria-labelledby="modalLabel{{ $product->id }}" aria-hidden="true">
+                                                <div class="modal-dialog modal-dialog-centered">
+                                                    <div class="modal-content">
+                                                        <div class="modal-header">
+                                                            <h5 class="modal-title" id="modalLabel{{ $product->id }}">Foto Produk</h5>
+                                                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                                        </div>
+                                                        <div class="modal-body text-center">
+                                                            <img src="{{ asset('storage/' . $product->photo) }}" class="img-fluid rounded" style="max-height: 80vh;">
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        @else
+                                            -
+                                        @endif
+                                    </td>
+                                    <td>
                                         <div class="d-flex">
                                             <a href="/products/edit/{{ $product->id }}" class="btn btn-sm btn-warning mr-2">
                                                 Edit
                                             </a>
-                                            {{-- <form action="{{ url('/products/' . $product->id) }}" method="POST" onsubmit="return confirm('Apakah Anda yakin ingin menghapus produk ini?');">
-                                                @csrf
-                                                @method('DELETE')
-                                                <button type="submit" class="btn btn-sm btn-danger">
-                                                    HAPUS
-                                                </button>
-                                            </form> --}}
                                             <button type="button" class="btn btn-sm btn-danger" data-toggle="modal" data-target="#modal-delete-{{ $product->id }}">
                                                 Hapus
                                             </button>

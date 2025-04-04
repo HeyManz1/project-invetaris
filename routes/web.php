@@ -4,6 +4,7 @@ use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\ProductController;
 use App\Http\Controllers\Admin\CategoryController;
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\LandingPageController;
 use App\Http\Middleware\IsLogin;
 use Illuminate\Support\Facades\Route;
 
@@ -31,3 +32,8 @@ Route::middleware(IsLogin::class)->group(function(){
     Route::put('/categories/{id}', [CategoryController::class, 'update'])->name('categories.update');
     Route::delete('/categories/{id}', [CategoryController::class, 'delete'])->name('categories.delete');
 });
+
+
+//route landingpage
+Route::get('/landingpage', [LandingPageController::class, 'index'])->name('landingpage.index');
+Route::get('/contact', [LandingPageController::class, 'contact'])->name('landingpage.contact');
