@@ -131,8 +131,8 @@
               </div>
             </div>
           </div>
-
           <button type="submit" class="btn btn-primary btn-block">Login</button>
+          <a href="{{ route('landingpage.index') }}" class="btn btn-outline-secondary btn-block mt-2 ">Kembali ke Home</a>
         </form>
       </div>
     </div>
